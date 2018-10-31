@@ -1,0 +1,30 @@
+{
+  "name": "async-react-table",
+  "version": "1.0.0",
+  "description": "A wrapper for react-table to make asynchronous sorting/paging/filtering a little bit easier",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seven-hills-technology/async-react-table.git"
+  },
+  "author": "Sean Price <seanprice@sevenhillstechnology.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/lodash": "^4.14.117",
+    "@types/react": "^16.4.18",
+    "@types/react-redux": "^6.0.9",
+    "@types/react-table": "^6.7.14",
+    "@types/redux": "^3.6.0",
+    "lodash": "^4.17.11",
+    "react": "^16.6.0",
+    "react-redux": "^5.1.0",
+    "react-table": "^6.8.6",
+    "redux": "^4.0.1",
+    "typescript": "^3.1.4"
+  }
+}
