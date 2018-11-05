@@ -6,8 +6,13 @@ import ReactTable, {Column, Filter, SortingRule} from "react-table";
 import {setGridQueryParameters, fetchData} from "./actions";
 import {QueryParameters, QueryResult, State} from "./models";
 
+interface ComponentState {
+    hasFirstFetchOccurred: boolean;
+}
+
 interface OwnProps<T> {
     initialQueryParameters?: QueryParameters;
+    forceFetchOnMount?: boolean;
     dataRetrievalFunction: (queryParameters: QueryParameters) => Promise<QueryResult<T>>
 }
 
@@ -25,13 +30,27 @@ interface DispatchProps<T> {
     }
 }
 
-class Grid<T> extends React.Component<OwnProps<T> & StateProps<T> & DispatchProps<T>> {
-    props!: OwnProps<T> & StateProps<T> & DispatchProps<T>;
+type CombinedProps<T> = OwnProps<T> & StateProps<T> & DispatchProps<T>;
+
+class Grid<T> extends React.Component<CombinedProps<T>, ComponentState> {
+    props!: CombinedProps<T>;
     gridName!: string;
 
+    static defaultProps: any = {
+        initialQueryParameters: {page: 0, pageSize: 10, sorts: [], filters: []},
+        forceFetchOnMount: true
+    }
+
+    constructor(props: OwnProps<T> & StateProps<T> & DispatchProps<T>) {
+        super(props);
+        this.state = {
+            hasFirstFetchOccurred: false
+        };
+    }
+
     async componentDidMount() {
-        const initialQueryParameters = this.props.initialQueryParameters || {page: 0, pageSize: 10, sorts: [], filters: []};
-        await this.setGridQueryParameters(initialQueryParameters);
+        await this.setGridQueryParameters(this.props.initialQueryParameters as QueryParameters);
+        await this.fetchDataIfRequired();
     }
 
     async componentDidUpdate() {
@@ -58,8 +77,15 @@ class Grid<T> extends React.Component<OwnProps<T> & StateProps<T> & DispatchProp
     }
 
     async fetchDataIfRequired() {
-        if (this.props.isLoading || _.isEqual(this.props.queryParameters, this.props.queryResultParameters)) {
-            return;
+        const {hasFirstFetchOccurred} = this.state;
+        if (!hasFirstFetchOccurred) {
+            this.setState({...this.state, hasFirstFetchOccurred: true});
+        }
+
+        if (!this.props.forceFetchOnMount || hasFirstFetchOccurred) {
+            if (this.props.isLoading || _.isEqual(this.props.queryParameters, this.props.queryResultParameters)) {
+                return;
+            }
         }
 
         await this.props.actions.fetchData(this.gridName, this.props.dataRetrievalFunction);
