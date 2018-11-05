@@ -1,6 +1,6 @@
 {
   "name": "async-react-table",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A wrapper for react-table to make asynchronous sorting/paging/filtering a little bit easier",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seven-hills-technology/async-react-table.git"
+    "url": "git+https://github.com/reperio/async-react-table.git"
   },
   "author": "Sean Price <seanprice@sevenhillstechnology.com>",
   "license": "MIT",
