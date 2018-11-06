@@ -1,6 +1,6 @@
 {
   "name": "async-react-table",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A wrapper for react-table to make asynchronous sorting/paging/filtering a little bit easier",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

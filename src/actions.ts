@@ -23,13 +23,18 @@ export const fetchData = <T>(gridName: string, dataRetrievalFunction: (queryPara
         payload: { gridName, isLoading: true }
     });
 
+    const queryResultParameters = getState().grid.grids[gridName].queryParameters;
     try {
-        const queryResultParameters = getState().grid.grids[gridName].queryParameters;
         const queryResult = await dataRetrievalFunction(queryResultParameters);
 
         dispatch({
             type: gridActionTypes.GRID_SET_QUERY_RESULT,
             payload: {gridName, queryResult, queryResultParameters}
+        });
+    } catch (e) {
+        dispatch({
+            type: gridActionTypes.GRID_SET_QUERY_RESULT,
+            payload: {gridName, queryResult: null, queryResultParameters}
         });
     } finally {
 
