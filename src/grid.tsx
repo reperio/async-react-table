@@ -3,7 +3,7 @@ import _ from "lodash";
 import {connect, ConnectedComponentClass} from "react-redux";
 import {bindActionCreators} from "redux";
 import ReactTable, {Column, Filter, SortingRule} from "react-table";
-import {setGridQueryParameters, fetchData} from "./actions";
+import {setGridQueryParameters, fetchData, setReloadRequested} from "./actions";
 import {QueryParameters, QueryResult, State} from "./models";
 
 interface ComponentState {
@@ -18,6 +18,7 @@ interface OwnProps<T> {
 
 interface StateProps<T> {
     isLoading: boolean;
+    isReloadRequested: boolean;
     queryParameters: QueryParameters;
     queryResult: QueryResult<T>;
     queryResultParameters: QueryParameters;
@@ -27,6 +28,7 @@ interface DispatchProps<T> {
     actions: {
         setGridQueryParameters: (gridName: string, queryParameters: QueryParameters) => void;
         fetchData: (gridName: string, dataRetrievalFunction: (queryParameters: QueryParameters) => Promise<QueryResult<T>>) => void;
+        setReloadRequested: (gridName: string, isReloadRequested: boolean) => void;
     }
 }
 
@@ -82,9 +84,12 @@ class Grid<T> extends React.Component<CombinedProps<T>, ComponentState> {
             this.setState({...this.state, hasFirstFetchOccurred: true});
         }
 
-        if (!this.props.forceFetchOnMount || hasFirstFetchOccurred) {
-            if (this.props.isLoading || _.isEqual(this.props.queryParameters, this.props.queryResultParameters)) {
+        if (!this.props.forceFetchOnMount || hasFirstFetchOccurred || this.props.isReloadRequested) {
+            if (this.props.isLoading || !this.props.isReloadRequested && _.isEqual(this.props.queryParameters, this.props.queryResultParameters)) {
                 return;
+            }
+            if (this.props.isReloadRequested) {
+                await this.props.actions.setReloadRequested(this.gridName, false);
             }
         }
 
@@ -163,6 +168,7 @@ export function createGrid<T>(gridName: string): ConnectedComponentClass<typeof 
     function mapStateToProps(state: State): StateProps<T> {
         return {
             isLoading: state.grid.grids[gridName] && state.grid.grids[gridName].isLoading != null ? state.grid.grids[gridName].isLoading : false,
+            isReloadRequested: state.grid.grids[gridName] && state.grid.grids[gridName].isReloadRequested != null ? state.grid.grids[gridName].isReloadRequested : false,
             queryParameters: state.grid.grids[gridName] && state.grid.grids[gridName].queryParameters || null,
             queryResult: state.grid.grids[gridName] && state.grid.grids[gridName].queryResult || null,
             queryResultParameters: state.grid.grids[gridName] && state.grid.grids[gridName].queryResultParameters || null
@@ -171,7 +177,7 @@ export function createGrid<T>(gridName: string): ConnectedComponentClass<typeof 
 
     function mapActionToProps(dispatch: any): DispatchProps<T> {
         return {
-            actions: bindActionCreators({setGridQueryParameters, fetchData}, dispatch)
+            actions: bindActionCreators({setGridQueryParameters, fetchData, setReloadRequested}, dispatch)
         };
     }
 

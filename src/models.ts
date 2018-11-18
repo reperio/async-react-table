@@ -22,6 +22,7 @@ export interface GridState {
     queryResult: QueryResult<any>;
     queryResultParameters: QueryParameters;
     isLoading: boolean;
+    isReloadRequested: boolean;
 }
 
 export interface State {

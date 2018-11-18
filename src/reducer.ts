@@ -44,6 +44,18 @@ export function reducer(state = initialState, action: {type: string, payload: an
                 }
             }
         }
+        case gridActionTypes.GRID_SET_IS_RELOAD_REQUESTED: {
+            const {gridName, isReloadRequested} = action.payload;
+            return {
+                grids: {
+                    ...state.grids,
+                    [gridName]: {
+                        ...state.grids[gridName],
+                        isReloadRequested
+                    }
+                }
+            }
+        }
         default: {
             return state;
         }
